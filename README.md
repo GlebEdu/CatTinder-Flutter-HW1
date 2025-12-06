@@ -69,7 +69,7 @@ flutter pub get
 flutter run
 ```
 
-### Для разработчиков
+### Использование ключа 
 Приложение использует TheCatAPI. В учебных целях API-ключ оставлен в открытом доступе:
 
 ```dart
@@ -77,7 +77,7 @@ flutter run
 static const String apiKey = 'live_czeFCZ96bAVUO8pW99fQhfvo5minkWwiRvx4HOsdaOIknUGY3JMgaavMfi4cavD1';
 ```
 
-Для production использования получите свой ключ на [thecatapi.com](https://thecatapi.com/signup).
+Получить свой ключ можно на [thecatapi.com](https://thecatapi.com/signup).
 
 ## Технологии
 
