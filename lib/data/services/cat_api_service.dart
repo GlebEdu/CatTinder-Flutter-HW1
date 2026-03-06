@@ -1,15 +1,15 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../constants/api_constants.dart';
-import '../models/cat_image.dart';
-import '../models/breed.dart';
+import '../../constants/api_constants.dart';
+import '../models/cat_image_model.dart';
+import '../models/breed_model.dart';
 
 class CatApiService {
   final http.Client client;
 
   CatApiService({http.Client? client}) : client = client ?? http.Client();
 
-  Future<List<CatImage>> getRandomCatWithBreed() async {
+  Future<List<CatImageModel>> getRandomCatWithBreed() async {
     try {
       final response = await client.get(
         Uri.parse(
@@ -19,7 +19,7 @@ class CatApiService {
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
-        return data.map((json) => CatImage.fromJson(json)).toList();
+        return data.map((json) => CatImageModel.fromJson(json)).toList();
       } else {
         throw Exception('Failed to load cat image: ${response.statusCode}');
       }
@@ -28,7 +28,7 @@ class CatApiService {
     }
   }
 
-  Future<List<Breed>> getAllBreeds() async {
+  Future<List<BreedModel>> getAllBreeds() async {
     try {
       final response = await client.get(
         Uri.parse('${ApiConstants.baseUrl}${ApiConstants.breedsEndpoint}'),
@@ -37,7 +37,7 @@ class CatApiService {
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
-        return data.map((json) => Breed.fromJson(json)).toList();
+        return data.map((json) => BreedModel.fromJson(json)).toList();
       } else {
         throw Exception('Failed to load breeds: ${response.statusCode}');
       }
@@ -46,7 +46,7 @@ class CatApiService {
     }
   }
 
-  Future<List<CatImage>> getCatsByBreed(String breedId) async {
+  Future<List<CatImageModel>> getCatsByBreed(String breedId) async {
     try {
       final response = await client.get(
         Uri.parse(
@@ -56,7 +56,7 @@ class CatApiService {
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
-        return data.map((json) => CatImage.fromJson(json)).toList();
+        return data.map((json) => CatImageModel.fromJson(json)).toList();
       } else {
         throw Exception('Failed to load cats for breed $breedId');
       }

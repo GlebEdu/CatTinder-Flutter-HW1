@@ -12,17 +12,6 @@ class CatImage extends Equatable {
     required this.breeds,
   });
 
-  factory CatImage.fromJson(Map<String, dynamic> json) {
-    final breedsJson = json['breeds'] as List? ?? [];
-    final breeds = breedsJson.map((b) => Breed.fromJson(b)).toList();
-
-    return CatImage(
-      id: json['id'] ?? '',
-      url: json['url'] ?? '',
-      breeds: breeds,
-    );
-  }
-
   @override
   List<Object?> get props => [id, url, breeds];
 }

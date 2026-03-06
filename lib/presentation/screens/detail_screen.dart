@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import '../models/cat_image.dart';
-import '../models/breed.dart';
+import 'package:cattinder_hw1/domain/entities/cat_image.dart';
+import 'package:cattinder_hw1/domain/entities/breed.dart';
 
 class DetailScreen extends StatelessWidget {
   final CatImage catImage;
@@ -15,6 +15,8 @@ class DetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final adaptability = breed.adaptability;
+    final intelligence = breed.intelligence;
     return Scaffold(
       appBar: AppBar(
         title: Text(breed.name),
@@ -66,11 +68,9 @@ class DetailScreen extends StatelessWidget {
                   if (breed.lifeSpan.isNotEmpty)
                     _buildInfoCard('Продолжительность жизни', breed.lifeSpan),
                   const SizedBox(height: 8),
-                  if (breed.adaptability != null)
-                    _buildRatingBar('Адаптивность', breed.adaptability!),
+                  if (adaptability != null) _buildRatingBar('Адаптивность', adaptability),
                   const SizedBox(height: 8),
-                  if (breed.intelligence != null)
-                    _buildRatingBar('Интеллект', breed.intelligence!),
+                  if (intelligence != null) _buildRatingBar('Интеллект', intelligence),
                 ],
               ),
             ),

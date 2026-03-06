@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import '../services/cat_api_service.dart';
-import '../models/breed.dart';
-import '../widgets/error_dialog.dart';
-import '../screens/detail_screen.dart';
-import '../models/cat_image.dart';
+import 'package:cattinder_hw1/domain/entities/breed.dart';
+import 'package:cattinder_hw1/presentation/widgets/error_dialog.dart';
+import 'package:cattinder_hw1/presentation/screens/detail_screen.dart';
+import 'package:cattinder_hw1/domain/entities/cat_image.dart';
+import 'package:get_it/get_it.dart';
+import 'package:cattinder_hw1/domain/usecases/get_all_breeds_usecase.dart';
+import 'package:cattinder_hw1/domain/usecases/get_cats_by_breed_usecase.dart';
 
 class BreedsScreen extends StatefulWidget {
   const BreedsScreen({super.key});
@@ -13,11 +15,9 @@ class BreedsScreen extends StatefulWidget {
 }
 
 class BreedsScreenState extends State<BreedsScreen> {
-  final CatApiService _apiService = CatApiService();
   List<Breed> _breeds = [];
   bool _isLoading = false;
   String? _error;
-
   @override
   void initState() {
     super.initState();
@@ -31,7 +31,8 @@ class BreedsScreenState extends State<BreedsScreen> {
     });
 
     try {
-      final breeds = await _apiService.getAllBreeds();
+      final usecase = GetIt.I<GetAllBreedsUseCase>();
+      final breeds = await usecase.call();
       if (!mounted) return;
 
       setState(() {
@@ -49,7 +50,7 @@ class BreedsScreenState extends State<BreedsScreen> {
       if (mounted) {
         ErrorDialog.show(
           context,
-          _error!,
+          _error ?? 'Ошибка',
           _loadBreeds,
         );
       }
@@ -63,7 +64,8 @@ class BreedsScreenState extends State<BreedsScreen> {
       });
 
       // Получаем изображения для этой породы
-      final catImages = await _apiService.getCatsByBreed(breed.id);
+      final getByBreed = GetIt.I<GetCatsByBreedUseCase>();
+      final catImages = await getByBreed.call(breed.id);
 
       if (!mounted) return;
 
@@ -129,8 +131,8 @@ class BreedsScreenState extends State<BreedsScreen> {
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : _error != null
-              ? Center(child: Text(_error!))
+                : _error != null
+                  ? Center(child: Text(_error ?? 'Ошибка'))
               : ListView.builder(
                   itemCount: _breeds.length,
                   itemBuilder: (context, index) {

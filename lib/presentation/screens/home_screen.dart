@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import '../services/cat_api_service.dart';
-import '../models/cat_image.dart';
-import '../widgets/cat_card.dart';
-import '../widgets/error_dialog.dart';
-import 'detail_screen.dart';
+import 'package:cattinder_hw1/domain/entities/cat_image.dart';
+import 'package:cattinder_hw1/presentation/widgets/cat_card.dart';
+import 'package:cattinder_hw1/presentation/widgets/error_dialog.dart';
+import 'package:cattinder_hw1/presentation/screens/detail_screen.dart';
+import 'package:get_it/get_it.dart';
+import 'package:cattinder_hw1/domain/usecases/get_random_cat_usecase.dart';
+import 'package:flutter/services.dart';
+import 'package:cattinder_hw1/data/services/auth_service.dart';
 
 class HomeScreen extends StatefulWidget {
   final int likesCount;
@@ -20,10 +23,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class HomeScreenState extends State<HomeScreen> {
-  final CatApiService _apiService = CatApiService();
   CatImage? _currentCat;
   bool _isLoading = false;
   String? _error;
+  
 
   // Для свайпа
   double _positionX = 0.0;
@@ -48,7 +51,8 @@ class HomeScreenState extends State<HomeScreen> {
     });
 
     try {
-      final cats = await _apiService.getRandomCatWithBreed();
+      final usecase = GetIt.I<GetRandomCatUseCase>();
+      final cats = await usecase.call();
       if (cats.isNotEmpty) {
         setState(() {
           _currentCat = cats.first;
@@ -68,7 +72,7 @@ class HomeScreenState extends State<HomeScreen> {
       if (mounted) {
         ErrorDialog.show(
           context,
-          _error!,
+          _error ?? 'Ошибка загрузки',
           _loadRandomCat,
         );
       }
@@ -76,14 +80,15 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   void _openDetailScreen() {
-    if (_currentCat != null && _currentCat!.breeds.isNotEmpty) {
+    final current = _currentCat;
+    if (current != null && current.breeds.isNotEmpty) {
       if (!mounted) return;
 
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) => DetailScreen(
-            catImage: _currentCat!,
-            breed: _currentCat!.breeds.first,
+            catImage: current,
+            breed: current.breeds.first,
           ),
         ),
       );
@@ -138,7 +143,14 @@ class HomeScreenState extends State<HomeScreen> {
   void _handlePanEnd(DragEndDetails details) {
     if (!_isDragging) return;
 
-    final dragDuration = DateTime.now().difference(_dragStartTime!);
+    final start = _dragStartTime;
+    if (start == null) {
+      _resetCard();
+      if (mounted) setState(() {});
+      return;
+    }
+
+    final dragDuration = DateTime.now().difference(start);
     const minSwipeDuration = Duration(milliseconds: 100);
     const swipeThreshold = 100.0;
 
@@ -176,6 +188,15 @@ class HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text('Кототиндер'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () async {
+              final auth = GetIt.I.get<AuthService>();
+              await auth.signOut();
+              if (!mounted) return;
+              SystemNavigator.pop();
+            },
+          ),
           Padding(
             padding: const EdgeInsets.only(right: 16),
             child: Row(
@@ -217,17 +238,22 @@ class HomeScreenState extends State<HomeScreen> {
                               onPanUpdate: _handlePanUpdate,
                               onPanEnd: _handlePanEnd,
                               child: Transform.translate(
-                                offset: Offset(_positionX, _positionY),
-                                child: Transform.rotate(
-                                  angle: _angle,
-                                  child: CatCard(
-                                    imageUrl: _currentCat!.url,
-                                    breedName: _currentCat!.breeds.isNotEmpty
-                                        ? _currentCat!.breeds.first.name
-                                        : 'Неизвестная порода',
-                                  ),
-                                ),
-                              ),
+                                                offset: Offset(_positionX, _positionY),
+                                                child: Transform.rotate(
+                                                  angle: _angle,
+                                                  child: Builder(builder: (context) {
+                                                    final current = _currentCat;
+                                                    final imageUrl = current?.url ?? '';
+                                                    final breedName = (current != null && current.breeds.isNotEmpty)
+                                                      ? current.breeds.first.name
+                                                      : 'Неизвестная порода';
+                                                    return CatCard(
+                                                      imageUrl: imageUrl,
+                                                      breedName: breedName,
+                                                    );
+                                                  }),
+                                                ),
+                                              ),
                             ),
                           ),
 

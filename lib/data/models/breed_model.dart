@@ -1,6 +1,6 @@
-import 'package:equatable/equatable.dart';
+import '../../domain/entities/breed.dart';
 
-class Breed extends Equatable {
+class BreedModel {
   final String id;
   final String name;
   final String description;
@@ -10,7 +10,7 @@ class Breed extends Equatable {
   final int? adaptability;
   final int? intelligence;
 
-  const Breed({
+  BreedModel({
     required this.id,
     required this.name,
     required this.description,
@@ -21,8 +21,8 @@ class Breed extends Equatable {
     this.intelligence,
   });
 
-  factory Breed.fromJson(Map<String, dynamic> json) {
-    return Breed(
+  factory BreedModel.fromJson(Map<String, dynamic> json) {
+    return BreedModel(
       id: json['id'] ?? '',
       name: json['name'] ?? '',
       description: json['description'] ?? '',
@@ -34,15 +34,16 @@ class Breed extends Equatable {
     );
   }
 
-  @override
-  List<Object?> get props => [
-        id,
-        name,
-        description,
-        temperament,
-        origin,
-        lifeSpan,
-        adaptability,
-        intelligence,
-      ];
+  Breed toEntity() {
+    return Breed(
+      id: id,
+      name: name,
+      description: description,
+      temperament: temperament,
+      origin: origin,
+      lifeSpan: lifeSpan,
+      adaptability: adaptability,
+      intelligence: intelligence,
+    );
+  }
 }
