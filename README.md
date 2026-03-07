@@ -32,12 +32,12 @@ Tinder-подобное приложение для знакомства с по
 ## Интерфейс приложения
 
 ### Онбординг
-![Онбординг](screenshots/onbgif.gif)
+<img src="screenshots/onbgif.gif" width="300">
 
 ### Вход/Регистрация 
-![Начальное окно](screenshots/20.png)
-![Регистрация](screenshots/21.png)
-![Вход](screenshots/21.png)
+<img src="screenshots/20.png" width="300">
+<img src="screenshots/21.png" width="300">
+<img src="screenshots/22.png" width="300">
 
 ### Главный экран
 ![Главный экран](screenshots/1.png)
